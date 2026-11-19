@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Orçamentos · Bebê Seguro Brasília</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { 50:"#eef3fc", 100:"#dbe5f8", 200:"#b9cbf0", 500:"#3a5fc8", 600:"#2f4fae", 700:"#223a8a", 800:"#1b2e6e" },
+          kgreen: { 500:"#4fa84a", 600:"#3f9a3a", 700:"#2f7d2c" },
+          kred: { 500:"#d6322b", 600:"#b92a24" },
+          kcream: "#fbf3c8",
+          ink: "#3d4450"
+        }
+      }
+    }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<style>
+  #pixQr svg { width: 180px; height: auto; }
+  input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+  .toast-enter { animation: toastIn .25s ease-out; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="bg-brand-50 text-ink min-h-screen overflow-x-hidden">
+
+<header class="bg-white border-b-4 border-brand-600 sticky top-0 z-20">
+  <div class="max-w-5xl mx-auto px-4 py-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3 min-w-0">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBAQFBgoGBgUFBgwICQcKDgwPDg4MDQ0PERYTDxAVEQ0NExoTFRcYGRkZDxIbHRsYHRYYGRj/2wBDAQQEBAYFBgsGBgsYEA0QGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBj/wAARCADwAN8DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD67/4UT8H/APonmh/9+P8A69L/AMKL+EH/AET3RP8Avx/9evQqKAuee/8ACi/hB/0T3RP+/P8A9el/4UZ8If8Aon2if9+f/r16DRQO7PP/APhRvwi/6J/on/fn/wCvR/wo/wCEf/RP9F/78/8A169AopWC7OAHwQ+Eg6eANF/78/8A16X/AIUj8Jf+hB0X/vz/APXrvqKLILs4H/hSXwm/6EHRv+/P/wBel/4Un8J/+hC0b/vz/wDXrvaKLILs4P8A4Up8KP8AoQ9G/wC/P/16P+FK/Cn/AKEPRv8Avz/9eu8pMjNHKuwXZwn/AApX4U/9CHo3/fmj/hSvwp/6EPRv+/Ndjf6ppul25uNS1C1soV5MlzKsSj8WIritQ+OPwh00utz8R/Dm9QSUjvUkJ/BSaap82yDmfck/4Ur8Kf8AoQ9G/wC/NH/ClfhR/wBCHo3/AH5/+vWZpPxS8NeI41uNG+JfhM3T8x6b9qiYeyO24Nu9SOh7Hv32j6pFq+kx3kabGJKSR7g3luDhlJHBwe/frU8tt0HM+5yf/ClPhP8A9CFo3/fn/wCvR/wpP4T/APQhaN/35/8Ar13uecUU+VBdnA/8KS+E3/Qg6N/35/8Ar0f8KR+Ev/Qg6L/35/8Ar131FFkF2cB/wpD4Sf8AQgaL/wB+f/r0n/CjvhH/ANE/0X/vz/8AXr0CiiyC7PP/APhRvwi/6J9on/fn/wCvSf8ACjPhCf8Amn2if9+f/r16DRTsF2ee/wDCi/hB/wBE90T/AL8f/Xo/4UV8IP8Aonuif9+P/r16FRQK555/won4P/8ARPND/wC/H/16P+FE/B//AKJ5of8A34/+vXodFABRRRQAUUUUAFFFFABRRRQAUmRTZZUiiaSR1RVG4sxwAB1JNfI/xj/aTv8AWru58J/C2+NrYITFeeIo/vSnoyW2eg9ZP++fWujDYWpiZ8lNEVKkaa5pHsvxL+P/AIG+G076XNNLrOvAZXSNOw8i+hlb7sQ/3jn0Br5m8W/tD/FrxdJLFaanB4T09+Ft9KG+4x/tTuM5/wB0LXl0FrFbq3lhiztvkkclnkY9WZjyT7mlmnigj3yuFHvX2ODyChRSdT3pfgeRVx85O0NEMvLYapcm51i5u9VuDyZtQuHuGJ+rk1Fc28SWbQ29vEhxuwqAYUcnpVVtUuLmfyNOtZJXPAwpYn6AV2Gj+EPET6e0lzpd7NLMuGIhOEU/wjisOIsypZXhuWCXPLRJfizqyvAVMXVvN+6jmLrT7WcrI9lBOBwUZAc/n3rS8P6r4l8L3BuvDHiXWdCk37ljs7thH/wKMko34is+90fxlo0zre6TfiNCfnktztI9cgVBbazDI3l3CmJh19K9elTw2MgqkLST16dUcVSNeg3GV1Y+hPBv7VvjTQ5FtvHmjweIrEcG+01Rb3SD1aMnY/4bTX1B4I+IfhD4iaF/avhLWoL+JcCWIZWWBv7skZ+ZD9R9K/O1WDKCpBB7ip9K1DWPDniOHxF4X1SfSdXg+7dQfxj+5IvSRT6GvIxvD9Oa5qGj7dDahmDTtUP0zzS14n8FPj9p3xHA8OeIYYdJ8Wwpua2Dfur1R1lgJ/VDyPcc17WDXyNWlOlJwqKzR60ZKSuhaKKKzGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFITSmvB/2l/itceC/BsPhLw9deX4j11GRZUPzWdsOJJvZjnavuSe1aUaUq01ThuyZSUVdnmX7RPxqn8U6td/DbwffNHotq5i1nUIGwbuQdbZGH8A/jI6n5egOfCI444YVijRURRtVVGABUdtBFaWkdvCu1EGAOv4n3rN1XUihNtbthv4mHb2r9Fy/L44WmqcN+rPArVpVp36E15qgjfyLVfMlJxxyAf6mvRfCHwclvba31vxzNdRR3BzbaXbjdcXHtj+Ee/AHcitH4CfDeHVZz4x1mASW8LbbSJxwzjqxHfFfRPl29ndtOI5Jru5YRoqDc7AdEQdgOvp3NfHcS8TzpVHgsC7NaOXW/Zf5n0OWZXBRVWqvRHNeH9H0jwtZIB4Pg0mDH+vidZyg/6aEDIPqRkD1rsVZWQMjBlIyCpyCKnfTNYgsjd3diixAZZI5PMdB/tDGPyJqpbwwQWyxWyqsQ5VVPAB549q/Pa6qc16t7vue9Bxt7gy9ubS2tt94VKk7VTbvLseiqvUn2rzfxh4D8PeIomuNV8FvaREf8f1i6m4h/2niXqP8AdLH2r0p4YnvYZhAZbkZjhCjLc9Qo/Dr6VavLHWNOh+03VgHtwMs1u/mNGPVlwCR9M1phZ16T9rQbTXVE1OSXuz6nxh4y8Aa74BdNQtbhdT0OfmG8i+ZCD2bHQ1jWd9FeR/Kdrj7ynqK+z7jRNJ1PTbu3mhjmsr5cyQ8FGJ/iA7E+3pXx18RvBt14A8dS2URb7K5821l9U9Pw6V+n8M8RvMX9VxX8RbPv/wAE+ZzTK1SXtae35DGWZbmC7tLma0vbaQTW13A22SCQchlPr/OvtX4B/GlfiToEuh+IGit/FumIPtUafKt3H0W4jHoejD+E+xFfEWn3q3lvnGJF4YVpaZq+seGPFFh4r8OTeRq2myebCc/LKv8AHE/qrjIP59q9fN8sWKhdL31seZhcS6UuWWx+mQORS1zPw/8AGulfEL4d6Z4t0ckW97FuaJj80Eg4eNvdWBH4V01fANNOz3Pd3CiiikAUUUUAFFFFABRRRQAUUUUAFFFFAEN1cw2dnLdXMixwQoZJJGOAqgZJPsAK/ODxf4uufiH8SdY8b3TP5d9L5djG3/LG0QkRKPTI+Y+7Gvtf9obVptF/Zk8Y3lu5SV7E2ysOoMrLF/JzXwhDGsNtHCgwqKFA9ABX0/DeHTlKs+mh5uY1GoqK6jlhubq5hsbGMyXdxIIYUHdj/nNei638BdPi8PKdN8QK+t20QlvbeQgq3TcR6EZrmPh3rGnaX8atFfU9ggy0YdukbuMK35/zr2YaBq9p4qkkuYnZGvFWS5PSRHcYGffPSufiXNcXhK8YUJ8iSv8A4vL5Hfk2Co1aTlUV239x6F4c0i30DwpYaTboES3hVMD1xyfzrrPCVhG6TazNhriZ2iQf88Y1ONvsSRk/h6VgyOB1qCHUryxuvNsJfKZ/9ZnlG9yvc+9fneGrKNXnnrc+gq0ZThyxPnS2+MnxK0H9o+81LWNMutUs8XFubSW4eOK1fJCoqDjIIUYIyck96+mpIZrdo3ntxbNcRJcNAP8Ali7DLIPYNmsSbRtJv9fTXr2wt7nVFxtvXjHmD0wQBiq2s6+1vqf2W8v5LRQgMcskZl8z1wTwMelOVR1U4LV9BqnaSa0M/wCK2peI/D3whvNc8OPLDdTXKWZuYuHtoSpLMp/hLOFXd2BrnP2XviR4w16wPhPxLosokg8+6kv57h5ZNpZdgbdnGSSBz0HArt9K1Jdc067sZZWvLFcIzMrJFNkcrtPBxxntzVnSIYfCtpLB4agt9Ojc7mijiXYx9TxnNXSrqnNR2S3JnRc4uPU29UsY9L8RyRW+0W9yhnEQ/wCWT5wwA7A5yPfdXl3xl8DN408N2EdoY472O6SNJX6BXODmu6iuHkkaWVmeaQ5kdzlifrVfxIHfwlemI7ZFQPG3owYEH86inip0MSsRQ91p3Q3QvD2dTVM+evFPwfsPDfg4614a1d9UudPONRQYwV6EqPauDUhkDKcgjINfQVnZv4bsNd1nXUNtp0Nk8cscnAmcjge/bpXzjpk4nsdwG0BiAPQZ4H5V+pcMY/EYqFSNeXNyta+vT5fqfLZ3haVJxlTVr9D3v9lbxs/h74oXvgK6kA07Xka8swx4ju41+dR/voM/VPevswdK/NLQNQk0f4i+FdZgcpJZ61aSBh6GUIw/FWIr9La8vPcOqWJ5l9rUMDUc6Sv0CiiivFOwKKKKACiiigAooooAKKKKACiiigDyD9qGFpv2VfFO3/lmLeU/RbmMn+VfGuh6HqPiPWItK0qJZLmRSyqWC8AZPJr70+LuiHxH8CPF2iopaS40qcIB1LhCy4/FRXw78OF8Nanb28mqa1daTfytEbS7hOAmVOc++7aOa+gyvFvD4OtOO67K/wA7djjr0VVqwi9vuO91n4R+Hb/4a3UmiWN2utrCLmCWYkSmSMYkiIOMc/z4rhfC/wAQfG8vjHwtp3iW+uhpqTKIllj2eaASoJJ+9gjGfavp6Gykt7aC41G4NxPGUy0Q2Bm4XcQPXv2rxX9oTw69jpui+LLSbbJZzfZyo4GCxdT9c5zXgZRmbx1R4HGJT578snq4tq2nq7Hs4nDqglWpO3La6XVHu0/IJHPpWa6P5vSs7wD4ntfGHgWz1SCRTKIxHOvdXHBzXR+T82etfKTpyozlTmrNaM9elVVk1sZOo6vbaFYRXmoSLFbGZIpJW4EYbgE+2cVp3VhY6paCO7hjuIThlzyPqDXO/EPw7J4l+F+saRbjM8sBaMerLyB+lfO3hnxr8VvAFglqJYL+yQfLZXhLhR6K/BH0zXRh8K68XKErSRrChOsm4K9j6tMdtY2WB5VvbxISeiqijv7Csy1vItV0yO/tcmCbJjb+8ucA/j1r5b1H4i/EL4teI7bwnuFpbXEoSSztFKDGed56kD3r6x07TYtN0S006LlbeJYhj2GKnEYaWGspv3mRy8m5BDEwbJ4rN8dXq6b8M9Zu3fbstWAOccnpXRCIDtXiP7RHjCCz8PQ+E7WYG5uT5k4U/dQdAfrWuV4SWNxdOhFbtfd1/A58XXVOm5voeUxax8RviPBo3he8uby6sJbjyo3EeFYjG4s38W0c81634m+E+gRaTFZ+EtOnXUiViiw52SKgxJJITwMnjPc11Pwp8MJ4c+EulvO5kaSN72Xb1DSDovoAuPxrb8W6Qh8JXMb69JpGnhAbi5UZkWNf4Q3oSfrzXv4/PprFxpYJezpwk9I3s9d2uvoebSwMXRbr+9Jrr0PlQQSf8JDpVky4lbVrSLA55+0IK/Tivz48NaPo2t/tJeCtE8OmeexbU4LmRpeSRCplkP0yn61+g46V7eeV/bTpytb3euj+48jCU/ZxlHzCiiivEOsKKKKACiiigAooooAKKKKACiiigBsiLJGUdQysMEHuK/NjxN4dk8F/EvxH4PZWQaZfuLfPBMDnzImH/AWA/Cv0pPSvkz9rjwU1lrOjfE2yi/cOq6Tqm0fdySYJT7AlkJ/2lr2MkxKo4nlltLQ5cZT56btujA8L/HDydOsNH1nS5Z7slbdLpHARj0BcdR+FeleJ/B1j4z8E3Oj6pOZPtOJY7hekT4+UoPQfrzXyVKHKBoztkUh0PowORX018KvGlt4i8KwW0soW5jG3aT1I6r9R/KuHiXJ1l84YvBrlV7vye535VjHioOnV1a/FHiGm3PjH4D+OPI1O3M2mXDYJU5inXP3lPZh6V9K+GPF2g+L9KS+0W9jmBHzRZw6H0IqLxt4RsfGvg+50K9xGZBuin27jC46MK+QfH/hnxh8H/FFhLZ6pPbrPvaG6t2Kh9uMgjp3FcdSphs8pOpUfJiV90/PyZ0R58G+Va0/xX/APuDtXC+JPhza6tcSXFhLHbmU5khkXMZ9SMdK8G8D/ALRfj241NNKvrC01bEbOZBGVkwuOu3r1r3TQ/ibFqGmQ3WoaTNAZV3fuWD49iDivEq5disJaVvua/Lc9PB45qXNRlZ/18i94M+G+g+DZJby1iE+ozjEt045x6D0FdhwBXlviX4sX+mRxf2VoInaViq+YxJ4GckCvnbxd8fviH4ga4sBdx6RCsjRNHZqUfgkYLHntV0sqxWK999e7/QxxGMjGTc3d/wBfI+lfiN8W9D8F2ElrazR3mrsCI7eM5CH1Y9q8V8E/DnxL8VPE7eKPEbyRaXLLvluH4afn7kY9O2apfCb4Par470W18R6xfNDp8kjZd8u8+1yDyT3wRmvri2trexsIrS2iWGCFAiIowFAFe1VxuGyaj7HAS5q0l70v5fJf5nFGlPFy5qytBbLv6mJrNzbeEPDjanBtSysoBH9kJwpVem30bH514b4++LMnjHRk0rTrCWxsmIeXzXBeT0BxwBW38a/GUN1HH4esJd4c4cqeCP4j9Ow/GvFbu4W1spJ2UsFHCKMlj2AHqTgV6vC2SU5Q+uYmN2ndf5nDnGNnBqhSe+57r+yh4afV/jLrHiyRM2uh2Qs4mPe4nILY+iJ/49X2aOleY/APwBJ8PPgnpum38QTV70nUdS7kTy4JX/gKhU/4DXp1c2YYj6xiJVDOhT9nBRCiiiuM1CiiigAooooAKKKKACiiigAooooAKxvFfhnS/GPgvU/DGsw+bY6hbtbyr3AI4YehBwQfUCtmg0LR3QH5pa94d1bwV4z1LwZr2Tf6bJsEpGBcwn/VzL7Mv5HIqppfiS+8Iaw17ax+bbz43x7iuGH8Snsa+xf2kPhJL468IR+KPDlqH8UaIjPEiDm9t+r259T/ABL/ALXHevi0G31PTdy52SDoRgqfQjsQe1fd5diaWY4f2VdX7r9Tx6qnhK3tKeh9M+DPivput6TE9y5kPRnTl1Po6/1Fee/tK3Wn6tpPhq9srmKdYp54XXuu9FIyD/uGvC457/Sb8m3nlt5kP3o2K5966+3XxT43+HWvXEzi6h0SOO+3Mvz8NhgCOvyFj+FfN5hwtHL5/XKc/cT/AD0Pap5ksTTdJr3rFj4EaLYaj8ZfscpeESadOVMZwSQUNfSzfDyEH91qjhfQxg/yNfLnwh1GPSvjp4bupGwks72hOeP3sbKP1K19sdK+VzXEVaVb3Xo0d2X2dOxxsPw9tPMUz6jM4B6KgX9ea+LNZtLVPGetyRx5B1K5CluTgTMB+lffep30WmaJealOwWK1gedyewVSx/lX5/wR3erXUcUCGS8v5sIo5zJK3H6tWuU16k3OU3oZ5ltGKPrb4Q6xpGhfAnw/BdXi+c0LzGJBuYb5GbGB7EVh/Ef4xQWFobKxX5348hX+dh6uR0HtXj3jTUPFHhTxFceEGvfs8NgqQJ9nG3cgUYOevNcpp9tJf3pmnZnUHLMxyWPpmvq8q4Sp1WsZXleMtVbrc5MTmqox9lBarTU3zd3Wp302q33E9wc7R0RewHtXqn7PXw4PxC+Kqa7qNvv8OeHJVmk3D5bm8HMcfuE++3vtHevONG0HWPFvi3T/AAh4biD6pqL7EY/dt4x9+Z/RVHPucDvX6FeAvBOjfD7wBp/hTQ4yLa0TDSuPnnkPLyue7Mck16edY2OHpLC0dL/gjycJSlVm61Q6UDApaKK+PPVCiiigAooooAKKKKACiiigAooooAKKKD0oA4n4n/E/w78KvBbeINfMspkfybWygwZbqUjIVc8DgZJPAFfMN7+2r4za5kfTvAmhRQfwR3N5K7j6soA/Sr/7bUV5/wAJD4JnbcbLybtF/uiXMZP4lf5Gvlit6VNNXZlObTsj6z8G/tq/2heiy8XeBzbyrzI2mXO9gv8AeVJANw+jZ9q4P4v6N4Svr+f4q/DS/hu9Bv5R/benopSXTLljxO0RwURzgNxgNznmvn68kNrNbX6HD28qsT6qThh9MGu9hhuJJWay8/zJI2jLQAkshHzKcdVI6g5B719FlmHhb29J8so79mcWIqP4JK6f3mdqNiLu3DoR5ij5T6j0r1r4B6hZ6Z4c1W21OAPaX0vkynbkgbcEH2wa8btDdaHY3EWoN5trbIXin6Hb/cI9RUYg8enQzqqaTrsOmufO3225FA/vbVOenciuriKrGvg1h5Ozbv8AcVlbdKq5pXSJ/FGjXfgjx9d6baSFm0+4W4sJwc+ZGGDxOD34AB9wa+3fDmu2nibwjpviGxbNvfW6Tr7ZHKn3ByD9K+A73W7/AFRLe6nv3vltwU3TfNIEPbd1IB5wfevX/hJ8UNQ0Pw5ceEPt1rDAGNxZTznAQM2ZEDdO5Iz6mvhMxwU61ONtZI9nB1oxqOPRnr/x/wDEqaF8HLvT45MXWsuLCMDrtPzSH6bAR+IrxP4GaFZ3fxAPiXVQF07RF8xM/wDLS5YYRQO5Ay3t8tYXxY+IV3428XLcOyNZaeptrSOMYEjE/O/4kAZ9B71x9rrWs29lDo9tf3e6Ryws9PyrSOepO35mPQfQCqwuClToOm3ZvcitXjKvzPVI9L+MckuufFP7bHCIhPAuB6KuRk+9c0TFp1iqRxvIchEjjXc8jngKAOpJ4xVG6/4S/Rbm1uPE+m6rBaTFYVlvPnC5PHzZJHJ6GrFnaazd+KI72OSe2+zlhaxW/MhOMF8jkHHTHI9q/QcqxFsBClB/Dp5HiY6LniHKSsnqfR3w21nwJ+z/AOHLi/8AFE7ax8QNURWu9O00LM2nxdUtmckLHjq2Tkt2OBWVqn7bniOXVmj8OeA9LNqhKvJeXjvz6AqoBP0GPevAPEcp0/wvcmFTE7gRpxg5Y4z9eawIYUt7dIYwAqDAxXiZlhadKScnzTlq3/kbUKspLRWS6H1j4Z/bUu/7Yjh8a+DLeHT3YB7zSp2doB/eMbj5gO+Dn2NfWmm6jZavo9rqmm3MdzZ3USzwTxnKyIwyrD2INfk9xjmv0V/ZtivYf2W/CK3xbebZ3jDdREZXMf4bSMe1eJUilqjrhJvc9XooorI0CiiigAooooAKKKKACiiigAooooA8T/al8Fy+LfgBe3llD5l/oUq6pCAMsyICJVH/AGzLH/gIr8/gwYBlOQeQa/WmeGK4tngnjWSKRSjowyGBGCD+FfmT8VvAk3w1+L2r+FDGy2SP9p05z/HbOSU/755Q+61vRl0Mqi6lv4c+D9I8S3m7UIv7Tn34h0qNtpfaQS0h7J2r6W0zwbqtobWeC9sdNNu7NFbQW4dVV/vKxJ+YjOAfavjOw8T6x4R1m01vQbjyb6OVVQkZDAnlSO4Ir7e8DeLbfxt4KsdctXQSMPLuoh/yzkA+YfnyPavLzaliKcfbLWDdvR9j1MBUpuPIlaRkwfDPwhJ41vNRutME8vyTLFIcxEnOTs6dVPtXbRWdtCW8mBI1YAFFACn8Olc1rniKDQvGsCyrJIstm3mJHj5SHG08+xaub134mW8eqW6QTxWYjzJsnfl+3IHbnpXm+yxWL5XJt6aXO1KFO/KrXOJ+O3wu0OEw+MNC01be7dmW+t7UbVmQKWMuwd1x8xHbntXi1jY2csZQr8y/wg4GPUYr6h8N+KLu88RL4knSO/t0je3hVsbCZMKxC+gXI565r5o+J2q6NpXxp1+w0TTfselxzIYoI3z5JaNWZQfTcTx26V70MBipYVU3Jp9H+ncMDj8NgsWq1akqkbWa0+9eZTk02K51GOztLeS5ldhGkSDczOTgKuOSTX1J8Ifhj4e8G+E7fUhZRT63eoJLq8kxIyE/8skP8Kjpx1Oa8h/Zt1/TY/GOu6tdaPFdX9hbxPp5kbiEszB2x6kADPUc+temSeLbvwtqNxbvdxW9pcSvLBHKdyBWYnA7gjOPwpYvA4r6uoRd7bvuYzxVLE4mdeMFBPZLZHqF9oulanbTW+pWMF5FMMOs6B8j056VyehfD7RtB1jVLrw6Da3XyxxSzjzhGSMkAHtyKreHviNZy6UscoN2Yvk82Fgc/XPf+ddH4Q1NNX0y9vlJ3vey5VuqgHCg/wDAQK8CUcThoyjdqL37P5G7jCbUmrtHHeJfhzNeeHvsWoWdn4htUjYBWjEU6MTkupHXB6L718x+LtH0/RfEb22l3ouLZssqMf3kByR5cn+0K+jvjt8T73wF4LWy0S4iGu3S7gzLu8qLOGfHr2FfKfnPcE3Ejl3kO9nbksTyTXs5ZSr8irT0i9vM8zMKtP4EtS9oeh3vijxXpfhjTVJu9UuktI8DO3ccFvooyx+lfqdoWkWfh/wxp2haemy0sLaO1hX0RFCj9BXx9+x38Pm1PxbqPxIv4f8ARdNDWGn7h9+dgPNcf7qkL/wM+lfaI6V21XrY4acbK4UUUVkaBRRRQAUUUUAFFFFABRRRQAUUUUAFeCftQ/CW9+IHgK317w3p5uvEWiktHBGP3l1bt/rIl9WyAyj1BHeve6DjvTTs7iaufkZeaXrUWpNLqeh6pYW9h80v2q0kjIboMgrx+Peuk8AfEPxR4Kgnn0O/2LdOXmt5lDpnoOD0IGBX1f8AtuXHiCH4SaC+nRTtpC6nv1J4wSi4Q+V5mOi7ieTxnHtXw+stjNL5m97aVupQ4z9ex/GvpMDjqMqPscRSUoPfrr3OWcJwlzU5WZ6Jf/EbXtY1Z9Q1K6m89wFLQuV49MVWGr2lzIZJLg726mTOT+dcaEu+sV5FIv8Atp/UGnF71RloIX/3ZCP5ivcw2LyumkqSUPkcdaNer8cr/M72z1Se0kWawv3hkByrRSYwa4/UvDOq3+q3F/NqkV1cXEhlllmBDOxPJOM1Q+0XCn5rCX/gDKf6077bIODbXY/4Dn+tdFV4DEb1F+RnCFansbvhrTdY8N6q1/a6z9meSMwyrBkeYh5wT9QK2pr2ItvuLsOe5d8muIa8lxgWl031AH8zTRPdt0sGH+/Io/lminUwGHVo1EKdOrUd5HYjxDHZMWtLmdWPH7olc/jWpoXxZ8WeG5Jm0q5XbKcsLgeZk+tedk37dEt09yxb+gpjpIP+PnUNi9xGAv8Aia48VicpqpqpFTv5HRR+sUvhk18zT8U+ItW8UeK31DX72S8uL2PymGM7OcKFUdByRge1XPBvgTx54p1238L6R4X1Wa8ZxF9oe1dIYlJ/1kjsAFAHJzz2rlJLq3hRorONmeQ4Lkksx7Y7k+lfqr8Km8QyfBHwq3i2KaPW/wCzIPtiz/6zzNgzv/2umfevAzLHQqQjCFNRitvJHXSpt6yd2XPAPg7TfAHw50nwjpQzBYQCMyEYMrnl5D7sxJ/GukoorwTpCiiigAooooAKKKKACiiigAooooAKO1FB6UAYHivxRB4U0NNRnsby+Mk6W8VtZoGkkd+gAJA7etcVN8TvGtwMaT8Kr4Z6SalqMFuPxC7jW78Sf+QVoh/6jVt/7NXzZr91OnjrWNQH/CRwXVv4jSJNXW4f7DaQ7kyjqCR3IxjHzCvGzDGVaVTkg7aH0GU5fTxMG5Ru/O/6NHfa98ZPH9p4juvDWs/Djw5qERtElntDqJIeOQsApLIVbO08EV4j4r8C/CLXftWoyeAPGPgS4IMjyaRLBf2aHqT5RYED2Xb9K9K+JDf8XX11lOMaFAR+c1eM+GZpU0i4iC6rbRz6DJK6X0jOlzIAP3kWScKATn6iujDYuqqalzas2ngaFWDmoJWS2v1V+5Jo/wCyr4n1PTodTg1+2NncKJIXKBGKHoSNxwa37X9knWjgS+KYx6gP/wDWNezXQ3fAvwunkvMGa1BiRsGQEHKg+/Sun8IafaWd3dPb+FrzRWIUFribzPMGTwOT0/rXhyzvGzlb2n5f5Hx8KfPVVO72T+/5fmz4/v8A4KapDqN5b2GtB1tp2tz5zDJZeCenrXPXnwt8eRa9a6Ppdr/al9co8kcFuFLbFxubrjAyK9r8YxpNr91HJYy3ynW7jNvE21n+Vuh/Wt/wBGkPxz8NRRwPAq6PdgROcsn+r4J719HluNqWU6nvWi3Z9dL9P0YUqfMlq+n4/L9TxKw/Z1+Nd/gyaDBZqf4rq6iTH4Ak/pXP3nwj+IcOsappkX2OefTbj7NOkdyFy+xX+UkDIwwr2XwBeTL8R/Bt+T4tsLm81O6hvNU1K5kksNQX94FghUsRuJAxkDG01F8THeOD4qPGzqw1EYMbFW/1MHQjoa+6VN0sV9VnTg7pWdpaNzUH9t/mvOxrGEJLm1/pX7Hgs3w48ew3sEF/pE9tHLKsP2iSQNGjMQq5KZPJIHTvXqui/soeLLqZH1e9aKLusKLGT/wJ2JH/AHzS+GpJEh1Ww8vVrO3ivtNeGw1aQyTR7pk3OCSfkYjjnsa+l7i2W7+JN0Z9K1S+WKaDZNDcFYbf5FOWXIzzz0r5Pi/GVsvrxo4e0b9vRNbt9+79TKcdUk3rb9fJ9jybwv4U0f4PePmi0nwDomratbwRz/btVvJJpo9xOPLJXYp46qgPvXsNp8fdRjAGqfD+7Hq9jfRyj8mCmuK8bf8AJZtQz/z4W/8AN68q0+3+06vfs2matckX7qJ7W4KIg3dCMjp1rxKGJqzpxnKTbd/62L5eRJJt3bX3fI+xfBfxJ0fxxd3dnYWGpWdzaxpLLFexBDtYkAggkHlTXZjpXhPwT/5KHr3/AGD7f/0ZJXu46V6dNtrU22bT6BRRRWgwooooAKKKKACiiigApM0tec/F7XfEmjaFoFv4Y1ZNKvNU1uDTnu2t1nMcbrISQjcZ+QVpSpupNQTt6ibPRN1Lu4r5s8X6prPhKKCXxn+0Vqeki4JESR6faxNJjrhRGxwM9aim8P6vrHgG68T6T8ePGuqWYs5biGW1u4UjkKKTj5IwRyMEcGto0aDhCq6vuydk+Sdm/J8qQ2pXatt5o9a+K17Bp3hfTNQuy6W1tq9tJNIqFti5YZIAJxzXi91p3gLW9bv2Hxa8rTdRvRfXWkedFFHI+VODuw2DtH5Vx/wz8b+OJdS8OxN8W9a1C4kFncXuk3yxXCtFK6qRuZdwByec5HFesQeG4PE+g3Wra7rF7Iiz3G5GSJ1VEdhwGQnoK8PifL1gayUpczd1omtvW3fQ9HBZq8MlBRd3d3Tjtp3TOC+IGr6DL8VtUkbWbGO1m0a3iE4uE2/elBwc4JGa84sbXQbPTbmDTdf1TxJeCwextIoYWuBErLjaojUgZwvJ9K9Tg8J/B+K+F/Bd3Qm7SCwUgfQGLA/CvQLuy1Hw1p+n3ul+KNXMbXdvH5DOixsjOAQQqjtXj4bMYqCp8v8ATKnndNwbpRbSSv70eit0uZWlzeH9U+Fuh6Rd+JLfTrq1jhkOJFDxyIOAQ3Tmuh0KW2s7t5LjxzHqqsuFjmkiGw56gg155f3GpeItTi0TXfi1HY6ze2DajDpOk6Tb27CPaWAMjK5JwD3BIBNeR+G9H1LUPh7ZeItQ+IGtWolhM0xl8h44wCcnLocDj1r3KfCCcHUeISs0vhnre9raa7PbQ8WMaqmpKKbS7tbd9bHX+IFsrrXtTZtej06SLVZ5UlV0yQeOMnpg0vhfxLoWh/F7RNT1HXBLZW+nXNvNf7DIodim3eUBAJwfyrjPDWv6dceIPsmgfEu0ub6UnYL7QrSUykf3WeIbunY16BH42+IIiv8AwteeJ4UT7RpnlXel6fFYyos00kbqdnB4UHpXryySeW05PEST5Yu6tKMmtrrmjbqbYLD1K04U1ZXaV9/1LvhnRPhvF4h0iVvjemq6bpV41/ZaLc3dvFFFMSxB7McFyQDXIeL7zwxqevfELTdS8S2Njb3+pgLcC4jzt8iI7kycHkV6T4q+GXhZLmytfFnjvWp5NQm+zWwu4oJTK5/hz5R9e9ZUXwO+HHhjxZZabD4l1Gy1fUNz2yLBAWfbycExHbj8KypcTYXndarKo5WSWkNLSUr6Jbvd2Z7Cy1WXLNa3+zL5/ceZaPDpMkpt9D1fWvFmq3l5ZmS5W2knxHFMrY3Im1VA3HrX0bNdaFL4gk1KHxfe6TLK6NNayr5KSbQBgh1B6DHWsXTdZ8S+Bbn4i2lv4l1HVV0fQre+s/7SKuI5GL5wqgDHA4q9rGo+LrXQba98XfFXSLC1ulXb52jQbSSu7b85OTivGz7HUszcKzunrvZ+XTlS22SMp5LVc1yzjbS2ktdL6W16nI+NdS07/hbl/c/2haiFtPt9snnLtbl+hzXCR2+jw3lw1p4tu1E0zTNBZsGGWP8Asg132meFPCnivxCTp/xO07UNR2k7LXTLMNgdcKUPr2rI8bXXin4f+PdL0rTviTqtjZy2Et5NcNBbqqbGAA2hNuOfSuDCV42jRe/9eZUcmqSvCc48yu9p/wCSPS/gYlxN4x1y/wDsN9FavZQRJNcWzwq7B3JClgM8EdPWvcpZ4oIjJNIkaDqznaB+Jr4x174k/EzVNH0lB8S3n0We+hS4vtKt47a48ppVib94uR1kHbqBXYeN/BXwu8C+FpfEXjl/EHiQK6wxRalqc91JcSt91EQsFJPPbgZr6vDYemoUueTcqjajGMbttW80uq6nn1aE6cpKTWmre3/BPb9Z+Lnwy8Pu8er+PNAt5U+9F9sR3H/AVJP6VZ8FfEfwf8Qob6Xwlqhv0sZViuCYXi2sw3DhwCQR3r5y8O+M/C/hPXdKtNe+B58DWOpyiKz1OS3hZN5+6shA3ITx1Oa9M8D7dG/at8VaeoEcet6Jaaiq9Azwu0LEfgy12VsLCm5U3TkpcvNFuUXGVmk17t1pd/a0sY9L3PbKKQdKWvMKCiiigAooooAK8u+NH+p8Df8AY12n/ouavUa8x+NNnrFxoHhu/wBG0K/1p9M1+3vprSwVWlMSpIGKhiAcFh3rpwivVS73/Jky2PJviTod9qnx003UPBes6FJ4rstKYSaJrluXhntmc/OjEYDZyDg5xUnwx1TTb/4BeKrSw8OwaDPYS31te2drOZoPP8slmjYk/KcjjoMcUnjU+F/G5tpPGPwh+Ikc9qCsN3b6bIksYPVd8T5I9uajh8Y/Dzwj8MtQ8J+H/C3ivSIXtZ1jin0O6y0joRlnKkkkkck12+yr1cto4N0ZucXDorJJtu7jL3lronG611NOaPtHK6tqeTfCmNbfxl4bdfs08d1DYkSKCJYJU+zB429VK+Ww9Dn1r6Y0T/kmOpf797/6G9fPXwp0ozaz4ZvLDwL4pk1MrY2l1fHTZUt41jdCzM7YXAC8sOoAr3nRdastO0C50fVbDVA5uLgSItlKwKtI3cDuDXmcfXliINp9Vr8u3T7rnN7SMZx5mlo/xsZng2Hxa/gzT30/WNHgs8HZHcQEuBuOcn866rxl/wAgKxOQf+Jha/8AowVy5034cYx/YGr46f8AHrc1pavrFlqmn6bpOlWOplkvbbYsllKoCq46sR2Ffn9CDjZehhTnGnh5U5SV7W3b/Cx59BqNvZ+IbK2k07Srm4uLyJGluJdtzbg6Z+6eJR94YEoOeBmvFdfFwf2UdLMW/wAgGE3O3/nj5p3fhnFfQN2Roc0Gp+L/AINeIIdY0+wexg1qzto9QQJtIyGiYsAc91yMmvIfBeuwRfDrTvD934X8S3syQGKaCLRZ5VOScg/Lg8Gv2zAOrTjGvCk3yTg3qne3PtZtW27eh23i205bp/oZ/jXWNP0248OT2Wg+H9Q0hZ7f7FMtxsmjcnGURP4QMH69a7Gb/kfb3v8AvtF/9K5qyNI8F6dZaoNS0T4IeMGuQ25JH0l1CH1USNhfyrffRPGMFxqHifWfA2vaRZLc6Uqrcwq8kgiuJHcqkbMcAMK5875Pqc4wi1ywkryau25Ra05pee2+9jvyx/7VC7WskeifGZlj8ReAZnYLGmupuduAPu9T+FJ4zZH/AGmvAUSsGkWC5ZlB5A2nn+dTeJvGHw88X6K+k67pHiG5ti29QNJuFZGHRlYLkGsbwzc/CvwnrDatpuleLJr4p5S3N5YXU7Rr6LuXivyPkl2Z9TQUoUYqUJc0VJWto+bzv0v2LvijnWvi6P8AqVbX/wBqVW+MazP4U8DJawQTztqduI4p/wDVu3l8Bv8AZJ6+1TwLeeONQ+J83h7StSkF94et7S1W5tXtzLIDJlRvA55Fat/cXWp2GlQ+IfhJ4umbTZI54GSJGCSoAAw2yc/jXXVpTlTptJ7P8yaVT2NWDe8bXV0n8EV1aOM8P2t9rH7RVjB4l07R/DWoaLC0sNnp0JUX6sD8wfoyj8+vvWZ+0MGPj/TQiqzHQ7jCv0J81cA+1eg6xqeiavruna3rPw78cRX+mtvt7mPTZFZOc4JQ/MPY8dfWvPviVqH/AAlvxQ0e6tPCfiq6tI9OmtpoRpUyyF2cMBjHTjrmow1OSqxumae0nUqxqONlGDVtLX8nfr5nPaHpFzq/wz8WQm3t4r3+zdRvPs1uuEglheF9q/jFnPvXdfGT7d4g+DXgz4g6XaS38ek3dnrVxbRruZ4SgLHHtkfhmtz4UeF9bufHN9LqPgfWdF0y80+6jnuNQRYxLJKI1wF3E5IU9scVQ+Hni7xNovw00zwrF8MPGWr6jpaPYu0dkIYGEbsqkSSsoI2heRX3eXyrwp0q2HgpSpTvZtK8ZRalq9tt+lz5TMZxlXlzO1169TmPjB8SvBvxQ+Glr4P8C3x1zX9VvLd7a0gibfb7WyXfIwuBkfiT0r03UBNof7RHwy1WRt32uC80O4bsxaISIf8AvqM1HpumfF+eZ59C+FXg/wAKtL96fUb5XkP1W3T+ZrRh+EnxI13xPoer+NPH+kiDSNQj1KGw0fStgMiZ+XzXctggkHjoa6qdOnQ9nRhaFKHtNHPnk3ONvsK1lZW+9nBKXNdvVu3S2x7eOlLSDpS144wooooAKKKKAEJxScDJPFc18RNf0Xwv8LNf1zxDcCHTraxlaU+cYmfKkBFYEEMxIAwc5IxXzP8As3+N5vCfiubwT451K/tLPXNEi1y0fXtUjuB5igicRP5j4hZCrLuIJEbHHWmldXE3Y+uYZ7e4QvbzxyqDgmNwwz6cVL+NfN/wN1bwxZ6P8VPD3gPXdEtrhdfv7jSLa0kjmCRCGPZIkQb54w3pwemay/CPx/8AE+sal4TRdd0fWbrUPBt5ql3o1tEiynUYOVjyp3KW5Hl4z8pNHKLmPqPA9TRgAcV8o/DX4wePvF3xQ8F6FH8TdE1Zdd0u61LU7K20lVfSpkj+W2J3Z4Y/xfN8hzwRV7wF8dvE2s+IPhvpur+KNGur3Vl1W31nS4oUjm8+3L+T3zGW2qoTHPPWhwDmR9Q8etRLPbyzPDHPE8ifeRWBK/Udq+VPh98cviR4j8Z+GL2+1XSGtda1JrK70Cd7OBrJcsMRYlNw0qbRlXTnnpxXS+B9c+H2n/tv+NU0TWtAhGqaRZZW2uo/9KvTNL5gGG+aXpkDmjlsFz6LCgDA4qKS5t4pUjkuI0d+FVnALfQd6k6iviLxV44m8b/ETwr4u8T614V0640zx4mkwaJJAE1Gwt4pseY8xfO18BmBULyuDRFXG3Y+3eKNq9a+TtY+OnxJXx9r0tnqekadFo+unTF8P6g9nAk0AkVd7vJMJ97qdylEK8gc819Yr9wEjBpONgTuGeOKUc85r5I1ceEPFXjX4qRfF74h33hbWtO1FrTRf+JnJafYrExr5U1vCrKJt5LZ4bJ4qX4mfHbxH4Y8XarF4U8XwrY+HG0+3nsb22tYluPMCFyTJJ58mUbO6NQF75waahcOY+rZ57a3QPczxxKTgNI4UZ/GpAFI3Dv3r4s/aS8bXHjHTviHoOoav4W0/TfDENrJpen38AlvNSaeME3NvJuG3AYhSoYdc+tdT4y+M3jm08b3nh3w1runaHYaRollfWU1z9jMeqGSHcXZ7iZMxAjb+6yepJ6CnysXMfUk91a2pj+03MUJlcRx+Y4Xe56KM9SfQVPj3/Wvm/4n/ENBovwm13WNf8K2ct1qenXl9o9wYp/LEnW6ilLgqifOA+CPm68Vp/FT4pazpHxW8GaN4U+JXhLStJ8Q2dw00+opHMlsqruS5V943BslVBIUlep5FLlY7nu11c2dlEJby5ht4ywQPNIEBYnAGT3JIAFS4GK+c/jZruq+Ffg34Vh8VeOPDGq6tHqlnNdxXdlEg1JPtSATxxl8x+WCGLLkZGeK1PiZ8SNbHxO8GaF4H+JXh7StI8QWF9O980MN4F8hdyyRsXAO4hl9PlbrihK4rnurSwLMsLSxrIwyqFhlsegqXivja88bX3xD1H4D+MIfFWiaF4qvrfVYrnVRHHKsOyJlb90zAclTgHgFvattfj/4g1r4Q/D14PFtrpniPXUvGvLi2t7XymFsxUkyXEixRE/K235id2BjinyMOY+r6K+Wm+NnxA1j9nn4f+JNIv8AT5NZ1e9ntNUSxktkupfK3jFuk58vecIzKecHgc16/wDBHxnd+OvhLBrWoX93e3iXdxa3Et1ZJaOrxyFShRGZflGBuUkHBpOLQ07no1FFFIYUV5Z/w0d8GM/8jrF/4B3H/wAbpD+0f8Fx/wAztF/4B3H/AMbosOzPS77T7HU7JrPUbO3u7d8bobiMSI2ORlSCDVFvC3ht5Y5X8PaUzxReRGxtIyUjwRsB28LgkY6cmuB/4aR+Co/5naL/AMA7j/43Sf8ADSfwU/6HeL/wDuP/AI3Tswsz0Cw8MeHNKuvtOl+H9KsZ9pTzbW0jifae2VAOKjs/CXhjTbo3em+HdJs7ne0ont7SONw7cM24DOT3PeuD/wCGlPgn/wBDxD/4B3H/AMbpP+Glfgl/0PEP/gHc/wDxulZhy+Rb8M/By00T4lx+OdW8V614g1O2hmgsxfJBFHbLKQZCFhjTcxAA3Nk4FdnB4T8MWupPqNt4c0mK8eb7Q1zHaRrI0nTeWAzu9+tcB/w0v8Ef+h5h/wDAK5/+N0n/AA0x8EP+h5h/8Arn/wCN07MXL5HoMPhTwzb+IZNfg8PaVHqsn379LSNZ2+sgG4/nSQ+EvC1vqC38HhrR4rpX8wTx2USyBv7wYLnPvXn3/DTXwP8A+h6h/wDAK5/+N0f8NNfA/wD6HqH/AMArn/43RZj5X2PWSMisabwj4WuNUm1K48NaRLez7fNuZLONpJNpyu5iuTjjGa8//wCGm/gd/wBD1D/4BXP/AMbpP+Gm/gd/0PcP/gFc/wDxulYOV9j0O58K+GbzXYtbvPD2lXGpxYEd9LaRvMmOmHI3D8618cV5L/w058Df+h7h/wDAK5/+N0f8NOfA3/oe4f8AwCuf/jdOzDlfY9JvfD2hajqUGo6hounXd5b/AOpuLi2SSSL/AHWIJX8KhuvCfhi/1R9TvvDmk3N7JH5L3M9nG8jJ/dLEZI9q88/4ab+B3/Q9w/8AgFc//G6P+Gm/gd/0PUP/AIBXP/xuizDlfY9Du/CfhjUL2K8v/Dmk3VxDEYYpp7SOR0jIxsUkZC47dKbqHhHwtqyWiar4a0e+WzAFsLmzjk8gDoE3Kdo+lef/APDTXwO/6HqH/wAArn/43R/w018D/wDoeof/AACuf/jdFmHK+x6Jf+GPDmqTJNqfh/Sr2REEaPc2kchVR0UFgcD2plx4R8LXYhF14b0efyYxFEJbKNvLQdFXK8Aeg4rz/wD4aZ+B5/5nqH/wCuf/AI3S/wDDS/wR/wCh5h/8Arn/AON0rMOV9j0XUPDmgas0Taroem3xiXbGbq2SXYPRdwOB9KYfC/hsi3B8P6URbIY4B9kj/dKc5VePlByeB6mvPh+0t8Ej/wAzxD/4B3P/AMbpf+GlPgmf+Z4h/wDAO4/+N0WYcr7HfJ4U8MRrAqeHNIUW+7yQLOMCLd97b8vGe+OtRzeDPCVxZQWc/hfRpba3k86GB7KIpE/95V24VvcVwv8Aw0n8FP8Aod4f/AO4/wDjdL/w0j8Ff+h3i/8AAO4/+N0WYcr7Hc3ngzwlqNgtjf8AhfRrq1R2lWCayjdFdvvMFK4BPc9TWnYafY6Xp8Vhptnb2drCNscFvGI0QegUAAV5oP2kPgsenjaL/wAA7j/43S/8NG/Bj/odYv8AwDuP/jdFg5Wep0V5b/w0Z8Gf+h1i/wDAO4/+N0v/AA0X8Gf+h0i/8A7j/wCN0BZn/9k=" alt="Bebê Seguro Brasília" class="h-10 sm:h-12 w-auto shrink-0 rounded" />
+      <div class="min-w-0">
+        <h1 class="font-bold text-base sm:text-lg text-brand-700 leading-tight">Bebê Seguro Brasília</h1>
+        <div class="flex items-center gap-2">
+          <p class="hidden sm:block text-xs text-ink">Painel de orçamentos</p>
+          <span id="fbStatus" class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">● Conectando…</span>
+        </div>
+      </div>
+    </div>
+    <nav class="grid grid-cols-3 gap-2 sm:flex sm:w-auto">
+      <button id="tabOrc" class="tab w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white">Orçamento</button>
+      <button id="tabAdm" class="tab w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 text-brand-700">Gestor</button>
+      <button id="tabTextos" class="tab w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 text-brand-700">Textos</button>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-6">
+
+<section id="viewOrc">
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-4">
+      <div class="bg-white rounded-xl shadow-sm p-4 grid sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2 relative">
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Período (retirada → devolução)</label>
+          <button id="periodoBtn" type="button" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-left bg-white focus:ring-2 focus:ring-brand-500 outline-none">Selecionar datas</button>
+          <div id="calendario" class="hidden absolute z-40 mt-1 left-0 bg-white border border-slate-200 rounded-xl shadow-xl p-3 w-72">
+            <div class="flex items-center justify-between mb-2">
+              <button id="calPrev" type="button" class="px-2 py-1 rounded hover:bg-slate-100">‹</button>
+              <span id="calTitulo" class="font-semibold text-sm capitalize"></span>
+              <button id="calNext" type="button" class="px-2 py-1 rounded hover:bg-slate-100">›</button>
+            </div>
+            <div class="grid grid-cols-7 text-center text-xs text-slate-500 mb-1">
+              <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+            </div>
+            <div id="calGrid" class="grid grid-cols-7 gap-1 text-sm"></div>
+            <p id="calDica" class="text-xs text-slate-500 mt-2 text-center">Selecione a data de retirada</p>
+          </div>
+          <input type="hidden" id="dataRetirada" />
+          <input type="hidden" id="dataDevolucao" />
+        </div>
+        <div class="sm:col-span-2 space-y-2 pt-1 border-t border-slate-100">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-600">Diárias calculadas:</span>
+            <span id="diariasInfo" class="font-bold text-brand-700">—</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <input type="range" id="diasSlider" min="1" max="30" value="1" class="flex-1 accent-brand-600 cursor-pointer" />
+            <span id="sliderBadge" class="text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 rounded px-2 py-0.5 min-w-[62px] text-center">1 dia</span>
+          </div>
+          <div id="fdsBox" class="hidden bg-brand-50 border border-brand-200 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold text-brand-800">Pacote Fim de Semana (Sex → Seg)</p>
+              <p class="text-[11px] text-brand-700">Aplica tarifa promocional fechada de FDS em vez da tabela corrida de 3 dias.</p>
+            </div>
+            <input type="checkbox" id="chkFds" checked class="w-4 h-4 accent-brand-600 cursor-pointer" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-semibold">Itens do pedido</h2>
+          <button id="btnAddItem" class="px-3 py-1.5 rounded-lg bg-kgreen-600 hover:bg-kgreen-700 text-white text-sm font-medium">+ Adicionar outro item</button>
+        </div>
+        <div id="listaItens" class="space-y-3"></div>
+        <p id="vazioItens" class="text-sm text-slate-400 text-center py-6">Nenhum item adicionado.</p>
+      </div>
+
+      <details class="bg-white rounded-xl shadow-sm p-4 group">
+        <summary class="font-semibold text-sm text-brand-700 cursor-pointer flex items-center justify-between select-none">
+          <span>Tabela Oficial de Consulta Rápida (4 Faixas • 1 a 30 dias)</span>
+          <span class="text-xs text-slate-500 font-normal group-open:hidden">Clique para expandir ▾</span>
+          <span class="text-xs text-slate-500 font-normal hidden group-open:inline">Recolher ▴</span>
+        </summary>
+        <div class="mt-3 pt-3 border-t border-slate-100 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-xs text-slate-500" id="refRegraResumo">Faixa 1 (1–2d) • Pacote FDS • Faixa 2 (3–10d) • Faixa 3 (11–20d) • Faixa 4 (21–30d)</p>
+            <select id="refClasseSelect" class="border border-slate-300 rounded-lg px-2 py-1 text-xs bg-white outline-none focus:ring-2 focus:ring-brand-500"></select>
+          </div>
+          <div class="overflow-x-auto max-h-64">
+            <table class="w-full text-xs text-left">
+              <thead class="text-slate-500 uppercase border-b border-slate-200 sticky top-0 bg-white">
+                <tr>
+                  <th class="py-1.5 px-2">Período</th>
+                  <th class="py-1.5 px-2">Faixa</th>
+                  <th class="py-1.5 px-2">Total / Item</th>
+                  <th class="py-1.5 px-2">Diária Média</th>
+                </tr>
+              </thead>
+              <tbody id="refTabelaCorpo" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <aside class="bg-white rounded-xl shadow-sm p-4 h-fit lg:sticky lg:top-24 space-y-4">
+      <h2 class="font-semibold">Resumo</h2>
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Desconto</label>
+        <select id="desconto" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 bg-white text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          <option value="0">Sem desconto</option>
+          <option value="5">5%</option>
+          <option value="10">10%</option>
+          <option value="15">15%</option>
+          <option value="20">20%</option>
+        </select>
+      </div>
+      <dl class="text-sm space-y-2 border-t border-slate-200 pt-3">
+        <div class="flex justify-between"><dt class="text-slate-600">Subtotal</dt><dd id="subtotal" class="font-medium">R$ 0,00</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-600">Desconto</dt><dd id="valorDesconto" class="font-medium text-kred-600">– R$ 0,00</dd></div>
+        <div class="flex justify-between text-base border-t border-slate-200 pt-2"><dt class="font-bold">Total</dt><dd id="total" class="font-bold text-kgreen-700">R$ 0,00</dd></div>
+      </dl>
+      <div id="alertas" class="hidden text-xs bg-amber-50 border border-amber-300 text-amber-800 rounded-lg p-3"></div>
+      <div id="pixArea" class="hidden border border-brand-200 rounded-lg p-3 space-y-2">
+        <p class="text-xs text-slate-500">Valor a pagar agora (50%): <strong id="pixValor" class="text-brand-700"></strong></p>
+        <div id="pixQr" class="flex justify-center bg-white"></div>
+        <textarea id="pixCode" readonly rows="3" class="w-full text-xs border border-slate-300 rounded p-2 bg-slate-50"></textarea>
+        <button id="btnCopiarPix" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 rounded-lg text-sm">Copiar código Pix</button>
+      </div>
+      <button id="btnCopiar" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg">Copiar resumo para WhatsApp</button>
+      <button id="btnPix" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg">Gerar Pix (50% da reserva)</button>
+      <button id="btnLimpar" class="w-full border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 rounded-lg text-sm">Novo orçamento</button>
+    </aside>
+  </div>
+</section>
+
+<section id="viewAdm" class="hidden">
+  <div id="admPainel" class="space-y-6 pb-16">
+    <div class="bg-white rounded-xl shadow-sm p-4 flex flex-wrap gap-3 items-end">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Nova classe</label>
+        <input id="novaClasseNome" placeholder="Ex.: Cadeira de Alimentação" class="w-full border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" />
+      </div>
+      <button id="btnNovaClasse" class="bg-kgreen-600 hover:bg-kgreen-700 text-white px-4 py-2 rounded-lg font-medium">Adicionar classe</button>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4 flex flex-wrap items-center gap-3">
+      <div class="flex-1 min-w-[180px]">
+        <p class="font-semibold text-sm">Compartilhar configurações</p>
+        <p class="text-xs text-slate-500">Exporte para enviar aos colaboradores ou importe um arquivo recebido.</p>
+      </div>
+      <button id="btnExportar" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Exportar</button>
+      <button id="btnImportar" class="bg-kgreen-600 hover:bg-kgreen-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Importar</button>
+      <input id="arquivoImport" type="file" accept="application/json,.json" class="hidden" />
+    </div>
+
+    <p class="text-xs text-slate-500 px-1">Sistema de <strong>4 faixas acumulativas</strong>: <strong>Faixa 1 (1–2d)</strong> cobra a diária cheia; <strong>Pacote FDS</strong> aplica valor fechado para Sex→Seg (3d); <strong>Faixa 2 (3–10d)</strong>, <strong>Faixa 3 (11–20d)</strong> e <strong>Faixa 4 (21–30d)</strong> somam o valor adicional por dia extra.</p>
+    <div id="listaClasses" class="space-y-4"></div>
+  </div>
+  <div id="calcFlutuante" class="fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur border-t border-slate-200 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
+    <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-2 text-xs">
+      <span class="font-semibold text-slate-500 uppercase">Calculadora</span>
+      <input id="calcDias" type="number" min="1" placeholder="dias" class="w-16 border border-slate-300 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-brand-500" />
+      <select id="calcClasse" class="border border-slate-300 rounded px-2 py-1 bg-white max-w-[180px] outline-none"></select>
+      <span class="text-slate-400">=</span>
+      <span id="calcTotal" class="font-bold text-kgreen-700">—</span>
+    </div>
+  </div>
+</section>
+<section id="viewTextos" class="hidden space-y-4">
+  <div class="bg-white rounded-xl shadow-sm p-4 grid sm:grid-cols-2 gap-3">
+    <h2 class="sm:col-span-2 font-semibold">Dados da empresa</h2>
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Chave Pix (CPF)</label>
+      <input id="txtPixCpf" class="w-full border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" />
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Favorecido</label>
+      <input id="txtFavorecido" class="w-full border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" />
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Endereço</label>
+      <input id="txtEndereco" class="w-full border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" />
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Link do mapa</label>
+      <input id="txtMapa" class="w-full border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" />
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm p-4 space-y-2">
+    <h2 class="font-semibold">Texto do orçamento para WhatsApp</h2>
+    <p class="text-xs text-slate-500">Marcadores disponíveis: <code>{{total}}</code> <code>{{retirada}}</code> <code>{{devolucao}}</code> <code>{{pixCpf}}</code> <code>{{favorecido}}</code> <code>{{endereco}}</code> <code>{{mapa}}</code>. Ao sair da aba, o texto é salvo automaticamente.</p>
+    <textarea id="txtModelo" rows="22" class="w-full font-mono text-xs border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+    <div class="flex justify-end">
+      <button id="btnRestaurarTextos" class="text-sm text-kred-600 hover:underline">Restaurar texto padrão</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDZhfov0e-0faLxHZD8KcpV7T_ETvms2-Y",
+  authDomain: "orcamentosbebeseguro.firebaseapp.com",
+  databaseURL: "https://orcamentosbebeseguro-default-rtdb.firebaseio.com",
+  projectId: "orcamentosbebeseguro",
+  storageBucket: "orcamentosbebeseguro.firebasestorage.app",
+  messagingSenderId: "246097379364",
+  appId: "1:246097379364:web:07690d9bc9eb3b66eed8b1",
+  measurementId: "G-NSHP5JNWHT"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const REF_PRECOS = db.ref("bebe_seguro/precos");
+const REF_TEXTOS = db.ref("bebe_seguro/textos");
+
+const CACHE_KEY_PRECOS = "bebe-seguro-cache-precos-v4";
+const CACHE_KEY_TEXTOS = "bebe-seguro-cache-textos-v1";
+
+// Regra padrão de 4 faixas acumulativas + Pacote FDS (Sex -> Seg)
+let REGRA_PADRAO = { f1: 45, fds: 95, f2: 12.5, f3: 5, f4: 3 };
+
+const PRECOS_PADRAO = {
+  versao: 4,
+  atualizadoEm: null,
+  classes: [
+    { id: "cadeira-veicular",     nome: "Cadeira Veicular",                        regra: { f1: 45, fds: 95, f2: 12.5, f3: 5.0, f4: 3.0 } },
+    { id: "bebe-conforto",        nome: "Bebê Conforto",                           regra: { f1: 45, fds: 95, f2: 12.5, f3: 5.0, f4: 3.0 } },
+    { id: "berco",                nome: "Berço",                                   regra: { f1: 45, fds: 95, f2: 12.5, f3: 5.0, f4: 3.0 } },
+    { id: "carrinho-passeio",     nome: "Carrinho de Passeio",                     regra: { f1: 45, fds: 95, f2: 12.5, f3: 5.0, f4: 3.0 } },
+    { id: "banheira-milenia",     nome: "Banheira Milenia Burigotto c/ Trocador",  regra: { f1: 35, fds: 75, f2: 7.5,  f3: 3.0, f4: 2.0 } },
+    { id: "cadeira-mila",         nome: "Cadeira de Alimentação Mila",             regra: { f1: 30, fds: 65, f2: 6.25, f3: 2.5, f4: 1.5 } },
+    { id: "cadeira-cosco",        nome: "Cadeira de Alimentação Cosco",            regra: { f1: 25, fds: 55, f2: 5.0,  f3: 2.0, f4: 1.0 } },
+    { id: "assento-com-encosto",  nome: "Assento c/ Encosto (Burigotto Protege)",  regra: { f1: 20, fds: 45, f2: 3.75, f3: 1.5, f4: 1.0 } },
+    { id: "assento-sem-encosto",  nome: "Assento s/ Encosto (Burigotto Protege)",  regra: { f1: 15, fds: 35, f2: 2.5,  f3: 0.6, f4: 0.4 } }
+  ]
+};
+
+function clonar(o){ return JSON.parse(JSON.stringify(o)); }
+
+let precos = carregarCachePrecos();
+let itens = [];
+let uidSeq = 1;
+
+function carregarCachePrecos(){
+  try {
+    const raw = localStorage.getItem(CACHE_KEY_PRECOS);
+    if (!raw) return clonar(PRECOS_PADRAO);
+    const obj = JSON.parse(raw);
+    if (!obj || !Array.isArray(obj.classes)) throw new Error("estrutura inválida");
+    return obj;
+  } catch (e) {
+    return clonar(PRECOS_PADRAO);
+  }
+}
+
+function salvarPrecos(){
+  precos.atualizadoEm = new Date().toISOString();
+  try { localStorage.setItem(CACHE_KEY_PRECOS, JSON.stringify(precos)); } catch {}
+  REF_PRECOS.set(clonar(precos))
+    .then(() => toast("☁️ Preços sincronizados na nuvem!"))
+    .catch(err => {
+      console.error("Erro ao salvar preços no Firebase:", err);
+      alert("Erro ao salvar no Firebase: " + (err.message || err));
+    });
+  return true;
+}
+
+const fmtBRL = v => v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => "i" + (uidSeq++);
+const fmtData = iso => { if(!iso) return ""; const [y,m,d]=iso.split("-"); return `${d}/${m}/${y}`; };
+
+function toast(msg){
+  const t = document.createElement("div");
+  t.className = "toast-enter fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+function calcularDiarias(retirada, devolucao){
+  if (!retirada || !devolucao) return { valido:false, motivo:"Informe as duas datas." };
+  const a = new Date(retirada + "T00:00:00");
+  const b = new Date(devolucao + "T00:00:00");
+  if (isNaN(a) || isNaN(b)) return { valido:false, motivo:"Data inválida." };
+  const dias = Math.round((b - a) / 86400000);
+  if (dias < 0) return { valido:false, motivo:"Devolução anterior à retirada." };
+  return { valido:true, dias: Math.max(1, dias) };
+}
+
+// Valor calculado pelas 4 faixas regressivas + Pacote FDS opcional nos 3 dias
+function valorClasse(classe, dias, usarFds = false){
+  const r = classe.regra;
+  if (!r || !(dias >= 1)) return { ok:false, valor:0 };
+  if (dias === 3 && usarFds && r.fds > 0) {
+    return { ok:true, valor: r.fds, diaria: r.fds / 3, faixa: "Pacote FDS (Sex→Seg)" };
+  }
+  let total = 0;
+  let faixa = "";
+  if (dias <= 2) {
+    total = r.f1 * dias;
+    faixa = "Faixa 1 (1–2d)";
+  } else if (dias <= 10) {
+    total = (r.f1 * 2) + r.f2 * (dias - 2);
+    faixa = "Faixa 2 (3–10d)";
+  } else if (dias <= 20) {
+    total = (r.f1 * 2) + (r.f2 * 8) + r.f3 * (dias - 10);
+    faixa = "Faixa 3 (11–20d)";
+  } else {
+    total = (r.f1 * 2) + (r.f2 * 8) + (r.f3 * 10) + r.f4 * (dias - 20);
+    faixa = dias <= 30 ? "Faixa 4 (21–30d)" : "Estendido (+30d)";
+  }
+  return { ok:true, valor: total, diaria: total / dias, faixa };
+}
+
+// Dados fixos usados no texto do WhatsApp (edite aqui se mudarem)
+const DADOS_EMPRESA = {
+  pixCpf: "04975400960",
+  favorecido: "Andreza Brentano",
+  endereco: "CLN 405, Bloco D – Asa Norte",
+  mapa: "https://maps.app.goo.gl/yVfCtgwd3zChaMCk6"
+};
+
+// ---------- Textos padrão editáveis (aba Textos) ----------
+const TEXTO_PADRAO = `*Valor total no período: {{total}}*
+     Retirada:{{retirada}}(*)
+     Devolução:{{devolucao}}(*)
+
+⚠️ *RETIRADA E DEVOLUÇÃO MEDIANTE AGENDAMENTO DE HORÁRIO (ATENDIMENTO APENAS NO PERÍODO DA MANHÃ)*⚠️
+
+Para garantir a reserva, solicitamos o pagamento de 50% do valor, e o restante no ato da retirada.
+
+Chave PIX (CPF): {{pixCpf}}
+Favorecido: {{favorecido}}
+
+📝 Dados para Contrato
+Favor enviar os dados de quem fará a retirada:
+Nome completo:
+CPF:
+Data de nascimento:
+Endereço:
+Profissão:
+Telefone:
+
+📍 Localização
+{{endereco}}
+{{mapa}}
+
+⚠️ Política de Cancelamento
+Até 3 dias antes do início da locação: Estorno total (100%).
+
+Menos de 3 dias: Estorno de 50% do valor da reserva.`;
+
+let TEXTO_MODELO = TEXTO_PADRAO;
+
+function carregarTextos(){
+  try {
+    const raw = localStorage.getItem(CACHE_KEY_TEXTOS);
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    if (o.dados) Object.assign(DADOS_EMPRESA, o.dados);
+    if (typeof o.modelo === "string") TEXTO_MODELO = o.modelo;
+  } catch (e) {
+    console.warn("Textos em cache inválidos, usando padrão:", e);
+  }
+}
+
+function carregarFormTextos(){
+  el("txtPixCpf").value = DADOS_EMPRESA.pixCpf;
+  el("txtFavorecido").value = DADOS_EMPRESA.favorecido;
+  el("txtEndereco").value = DADOS_EMPRESA.endereco;
+  el("txtMapa").value = DADOS_EMPRESA.mapa;
+  el("txtModelo").value = TEXTO_MODELO;
+}
+
+function persistirTextosFirebase(){
+  const payload = { dados: { ...DADOS_EMPRESA }, modelo: TEXTO_MODELO, atualizadoEm: new Date().toISOString() };
+  try { localStorage.setItem(CACHE_KEY_TEXTOS, JSON.stringify(payload)); } catch {}
+  REF_TEXTOS.set(payload)
+    .then(() => toast("☁️ Textos sincronizados na nuvem!"))
+    .catch(err => {
+      console.error("Erro ao salvar textos no Firebase:", err);
+      alert("Erro ao salvar textos no Firebase: " + (err.message || err));
+    });
+}
+
+function salvarTextos(){
+  const pixCpf = el("txtPixCpf").value.trim();
+  if (!pixCpf) { alert("Informe a chave Pix antes de sair da aba Textos."); return false; }
+  DADOS_EMPRESA.pixCpf = pixCpf;
+  DADOS_EMPRESA.favorecido = el("txtFavorecido").value.trim();
+  DADOS_EMPRESA.endereco = el("txtEndereco").value.trim();
+  DADOS_EMPRESA.mapa = el("txtMapa").value.trim();
+  TEXTO_MODELO = el("txtModelo").value;
+  persistirTextosFirebase();
+  return true;
+}
+
+carregarTextos();
+
+const DESCONTOS = { "0": 0, "5": 5, "10": 10, "15": 15, "20": 20 };
+
+// Desconto a critério do atendente, aplicado sobre o subtotal do pedido
+function calcularDesconto(subtotal, chave){
+  return subtotal * ((DESCONTOS[chave] || 0) / 100);
+}
+
+const el = id => document.getElementById(id);
+
+function renderSelectClasses(selectedId){
+  if (!precos.classes.length) return `<option value="">Nenhuma classe cadastrada</option>`;
+  return `<option value="">Selecione a classe…</option>` + precos.classes.map(c =>
+    `<option value="${esc(c.id)}" ${c.id===selectedId?"selected":""}>${esc(c.nome)}</option>`
+  ).join("");
+}
+
+function renderItens(){
+  el("vazioItens").classList.toggle("hidden", itens.length > 0);
+  el("listaItens").innerHTML = itens.map(it => `
+    <div class="grid grid-cols-12 gap-2 items-center bg-slate-50 rounded-lg p-2" data-uid="${it.uid}">
+      <select class="col-span-7 border border-slate-300 rounded-lg px-2 py-2 bg-white text-sm" data-campo="classeId">
+        ${renderSelectClasses(it.classeId)}
+      </select>
+      <input type="number" min="1" max="999" value="${it.quantidade}" data-campo="quantidade"
+        class="col-span-3 border border-slate-300 rounded-lg px-2 py-2 text-sm text-center" />
+      <button data-remover class="col-span-2 text-kred-600 hover:bg-kred-50 rounded-lg py-2 text-sm">✕</button>
+      <div class="col-span-12 text-xs text-slate-500 pl-1" data-linha-info></div>
+    </div>`).join("");
+  recalcular();
+}
+
+function adicionarItem(){
+  itens.push({ uid: uid(), classeId: "", quantidade: 1 });
+  renderItens();
+}
+
+function recalcular(){
+  const alertas = [];
+  atualizarPeriodo();
+  el("pixArea").classList.add("hidden"); // valor mudou: exige gerar o Pix de novo
+  const dt = calcularDiarias(el("dataRetirada").value, el("dataDevolucao").value);
+
+  if (!dt.valido) {
+    el("diariasInfo").textContent = "—";
+    el("fdsBox").classList.add("hidden");
+    if (el("dataRetirada").value && el("dataDevolucao").value) alertas.push(dt.motivo);
+  } else {
+    el("diariasInfo").textContent = `${dt.dias} diária${dt.dias>1?"s":""}`;
+    el("diasSlider").value = Math.min(30, dt.dias);
+    el("sliderBadge").textContent = `${dt.dias} ${dt.dias===1?"dia":"dias"}`;
+    el("fdsBox").classList.toggle("hidden", dt.dias !== 3);
+  }
+
+  const usarFds = dt.valido && dt.dias === 3 && el("chkFds").checked;
+  let subtotal = 0;
+
+  document.querySelectorAll("#listaItens > div").forEach(row => {
+    const it = itens.find(i => i.uid === row.dataset.uid);
+    const info = row.querySelector("[data-linha-info]");
+    if (!it) return;
+
+    const classe = precos.classes.find(c => c.id === it.classeId);
+    if (!classe || !dt.valido) {
+      info.textContent = !classe ? "Escolha a classe." : "Defina as datas.";
+      return;
+    }
+    const v = valorClasse(classe, dt.dias, usarFds);
+    if (!v.ok) {
+      info.textContent = `Sem tabela para ${dt.dias} diárias. Consulte o gestor.`;
+      info.className = "col-span-12 text-xs text-amber-700 pl-1";
+      alertas.push(`${classe.nome}: sem faixa para ${dt.dias} diárias.`);
+      return;
+    }
+    const valorLinha = v.valor * it.quantidade;
+    subtotal += valorLinha;
+    info.className = "col-span-12 text-xs text-slate-500 pl-1";
+    info.textContent = `${it.quantidade}× ${fmtBRL(v.valor)} (${v.faixa} · média ${fmtBRL(v.diaria)}/dia) = ${fmtBRL(valorLinha)}`;
+  });
+
+  const valorDesc = calcularDesconto(subtotal, el("desconto").value);
+  el("subtotal").textContent = fmtBRL(subtotal);
+  el("valorDesconto").textContent = "– " + fmtBRL(valorDesc);
+  el("total").textContent = fmtBRL(subtotal - valorDesc);
+
+  const box = el("alertas");
+  box.classList.toggle("hidden", alertas.length === 0);
+  box.innerHTML = alertas.map(a => `• ${esc(a)}`).join("<br>");
+}
+
+function gerarResumoWhatsApp(){
+  const dt = calcularDiarias(el("dataRetirada").value, el("dataDevolucao").value);
+  if (!dt.valido) return { erro: "Preencha datas válidas." };
+
+  const usarFds = dt.dias === 3 && el("chkFds").checked;
+  const itensValidos = [];
+  let subtotal = 0;
+
+  for (const it of itens) {
+    const classe = precos.classes.find(c => c.id === it.classeId);
+    if (!classe) continue;
+    const v = valorClasse(classe, dt.dias, usarFds);
+    if (!v.ok) return { erro: `Sem tabela para ${classe.nome} em ${dt.dias} diárias.` };
+    const linhaVal = v.valor * it.quantidade;
+    subtotal += linhaVal;
+    itensValidos.push({
+      quantidade: it.quantidade,
+      nome: classe.nome,
+      valorUnitario: v.valor,
+      linhaVal
+    });
+  }
+  if (!itensValidos.length) return { erro: "Adicione ao menos um item." };
+
+  const descPct = DESCONTOS[el("desconto").value] || 0;
+  const desc = calcularDesconto(subtotal, el("desconto").value);
+  const total = subtotal - desc;
+
+  const linhas = itensValidos.map(iv => {
+    const linhaComDesc = iv.linhaVal * (1 - descPct / 100);
+    const unitComDesc = iv.valorUnitario * (1 - descPct / 100);
+    const unitInfo = iv.quantidade > 1 ? ` (${fmtBRL(unitComDesc).replace(/\s+/g, " ")} cada)` : "";
+    const valorOriginalTxt = fmtBRL(iv.linhaVal).replace(/\s+/g, " ");
+    const valorFinalTxt = fmtBRL(linhaComDesc).replace(/\s+/g, " ");
+    const precoItem = descPct > 0
+      ? `~${valorOriginalTxt}~ *${valorFinalTxt}*`
+      : valorOriginalTxt;
+    return `• ${iv.quantidade}x ${iv.nome} — ${precoItem}${unitInfo}`;
+  });
+
+  const totalFormatado = fmtBRL(total).replace(/\s+/g, "") + (descPct > 0 ? ` (desconto de ${descPct}%)` : "");
+  const tituloItens = `*Itens orçados (${dt.dias} ${dt.dias===1?"diária":"diárias"}):*`;
+
+  const vars = {
+    total: totalFormatado,
+    retirada: fmtData(el("dataRetirada").value),
+    devolucao: fmtData(el("dataDevolucao").value),
+    pixCpf: DADOS_EMPRESA.pixCpf,
+    favorecido: DADOS_EMPRESA.favorecido,
+    endereco: DADOS_EMPRESA.endereco,
+    mapa: DADOS_EMPRESA.mapa
+  };
+  let texto = TEXTO_MODELO.replace(/\{\{(\w+)\}\}/g, (m, k) => (k in vars ? vars[k] : m));
+  // Insere a lista discriminada dos itens logo após a linha de Devolução caso o modelo não tenha {{itens}}
+  if (!TEXTO_MODELO.includes("{{itens}}")) {
+    texto = texto.replace(/(Devolução:[^\n]*)/, `$1\n\n${tituloItens}\n${linhas.join("\n")}`);
+  } else {
+    texto = texto.replace(/\{\{itens\}\}/g, linhas.join("\n"));
+  }
+  return { texto, total };
+}
+
+async function copiarResumo(){
+  const r = gerarResumoWhatsApp();
+  if (r.erro) return toast("⚠️ " + r.erro);
+  try {
+    await navigator.clipboard.writeText(r.texto);
+    toast("✅ Resumo copiado!");
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = r.texto; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove();
+    toast("✅ Resumo copiado!");
+  }
+}
+
+// ---------- PIX (BR Code estático, copia e cola) ----------
+function semAcento(t){ return String(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase(); }
+
+function crc16Ccitt(str){
+  let crc = 0xFFFF;
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i) << 8;
+    for (let b = 0; b < 8; b++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+const tlv = (id, val) => id + String(val.length).padStart(2, "0") + val;
+
+function gerarPixCopiaECola({ chave, nome, cidade, valor, txid = "***" }){
+  const contaPix = tlv("00", "br.gov.bcb.pix") + tlv("01", chave);
+  let p = tlv("00", "01")
+        + tlv("26", contaPix)
+        + tlv("52", "0000")
+        + tlv("53", "986");
+  if (valor > 0) p += tlv("54", valor.toFixed(2));
+  p += tlv("58", "BR")
+     + tlv("59", semAcento(nome).slice(0, 25))
+     + tlv("60", semAcento(cidade).slice(0, 15))
+     + tlv("62", tlv("05", txid));
+  p += "6304";
+  return p + crc16Ccitt(p);
+}
+
+function gerarPix(){
+  const r = gerarResumoWhatsApp();
+  if (r.erro) return toast("⚠️ " + r.erro);
+
+  const valor = Math.round(r.total * 50) / 100; // 50% do total, em centavos
+  const payload = gerarPixCopiaECola({
+    chave: DADOS_EMPRESA.pixCpf,
+    nome: DADOS_EMPRESA.favorecido,
+    cidade: "Brasilia",
+    valor
+  });
+
+  const qr = qrcode(0, "M");
+  qr.addData(payload);
+  qr.make();
+  el("pixQr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2 });
+  el("pixValor").textContent = fmtBRL(valor);
+  el("pixCode").value = payload;
+  el("pixArea").classList.remove("hidden");
+}
+
+async function copiarPix(){
+  const code = el("pixCode").value;
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+  } catch {
+    el("pixCode").select();
+    document.execCommand("copy");
+  }
+  toast("✅ Código Pix copiado!");
+}
+
+el("btnPix").onclick = gerarPix;
+el("btnCopiarPix").onclick = copiarPix;
+
+// ---------- Calendário de período (1º clique = retirada, 2º clique = devolução e fecha) ----------
+const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const isoDe = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+let calMes = new Date(); calMes.setDate(1);
+
+function atualizarPeriodo(){
+  const r = el("dataRetirada").value, d = el("dataDevolucao").value;
+  let txt = "Selecionar datas";
+  if (r && d) txt = `${fmtData(r)} → ${fmtData(d)}`;
+  else if (r) txt = `${fmtData(r)} → (escolha a devolução)`;
+  el("periodoBtn").textContent = txt;
+}
+
+function renderCalendario(){
+  const ano = calMes.getFullYear(), mes = calMes.getMonth();
+  el("calTitulo").textContent = `${MESES[mes]} ${ano}`;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const r = el("dataRetirada").value, d = el("dataDevolucao").value;
+  const primeiro = new Date(ano, mes, 1).getDay();
+  const dias = new Date(ano, mes + 1, 0).getDate();
+  let html = "";
+  for (let i = 0; i < primeiro; i++) html += `<span></span>`;
+  for (let dia = 1; dia <= dias; dia++) {
+    const dt = new Date(ano, mes, dia);
+    const iso = isoDe(dt);
+    const passado = dt < hoje;
+    let cls = "rounded py-1.5 ";
+    if (passado) cls += "text-slate-300 cursor-not-allowed";
+    else if (iso === r || iso === d) cls += "bg-brand-600 text-white font-semibold";
+    else if (r && d && iso > r && iso < d) cls += "bg-brand-100 text-brand-800";
+    else cls += "hover:bg-slate-100";
+    html += `<button type="button" data-iso="${iso}" ${passado ? "disabled" : ""} class="${cls}">${dia}</button>`;
+  }
+  el("calGrid").innerHTML = html;
+  el("calDica").textContent = (!r || (r && d)) ? "Selecione a data de retirada" : "Agora selecione a data de devolução";
+}
+
+function abrirCalendario(){
+  const base = el("dataRetirada").value ? new Date(el("dataRetirada").value + "T00:00:00") : new Date();
+  calMes = new Date(base.getFullYear(), base.getMonth(), 1);
+  renderCalendario();
+  el("calendario").classList.remove("hidden");
+}
+function fecharCalendario(){ el("calendario").classList.add("hidden"); }
+
+el("periodoBtn").onclick = e => {
+  e.stopPropagation();
+  el("calendario").classList.contains("hidden") ? abrirCalendario() : fecharCalendario();
+};
+el("calPrev").onclick = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() - 1, 1); renderCalendario(); };
+el("calNext").onclick = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() + 1, 1); renderCalendario(); };
+
+el("calGrid").addEventListener("click", e => {
+  e.stopPropagation();
+  const btn = e.target.closest("button[data-iso]");
+  if (!btn || btn.disabled) return;
+  const iso = btn.dataset.iso;
+  let r = el("dataRetirada").value, d = el("dataDevolucao").value;
+
+  if (!r || (r && d)) {
+    // 1º clique: retirada (reinicia a seleção)
+    r = iso; d = "";
+    el("dataRetirada").value = r;
+    el("dataDevolucao").value = d;
+    recalcular();
+    renderCalendario();
+  } else if (iso < r) {
+    // clicou antes da retirada: vira nova retirada
+    r = iso;
+    el("dataRetirada").value = r;
+    el("dataDevolucao").value = d;
+    recalcular();
+    renderCalendario();
+  } else {
+    // 2º clique: devolução -> define data final, calcula diárias e já fecha o calendário
+    d = iso;
+    el("dataRetirada").value = r;
+    el("dataDevolucao").value = d;
+    // Detecta automaticamente se é Sexta (5) -> Segunda (1) para marcar o Pacote FDS
+    const dtR = new Date(r + "T00:00:00");
+    const dtD = new Date(d + "T00:00:00");
+    const diff = Math.round((dtD - dtR) / 86400000);
+    el("chkFds").checked = (diff === 3 && dtR.getDay() === 5 && dtD.getDay() === 1);
+    recalcular();
+    fecharCalendario();
+  }
+});
+
+// Sincronização da barrinha de dias com as datas
+el("diasSlider").addEventListener("input", e => {
+  const dias = parseInt(e.target.value, 10) || 1;
+  el("sliderBadge").textContent = `${dias} ${dias===1?"dia":"dias"}`;
+  let r = el("dataRetirada").value;
+  if (!r) {
+    r = isoDe(new Date());
+    el("dataRetirada").value = r;
+  }
+  const dtR = new Date(r + "T00:00:00");
+  const dtD = new Date(dtR.getTime() + dias * 86400000);
+  el("dataDevolucao").value = isoDe(dtD);
+  el("chkFds").checked = (dias === 3 && dtR.getDay() === 5);
+  recalcular();
+});
+
+el("chkFds").addEventListener("change", recalcular);
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#calendario") && !e.target.closest("#periodoBtn")) fecharCalendario();
+});
+
+atualizarPeriodo();
+
+// ---------- Tabela de Consulta Rápida (aba Orçamento) ----------
+function renderRefSelect(){
+  const sel = el("refClasseSelect");
+  if (!sel) return;
+  const atual = sel.value;
+  sel.innerHTML = precos.classes.map(c => `<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join("");
+  if (precos.classes.some(c => c.id === atual)) sel.value = atual;
+  renderRefTabela();
+}
+
+function renderRefTabela(){
+  const sel = el("refClasseSelect");
+  const tbody = el("refTabelaCorpo");
+  if (!sel || !tbody) return;
+  const classe = precos.classes.find(c => c.id === sel.value) || precos.classes[0];
+  if (!classe) return;
+  const r = classe.regra;
+  el("refRegraResumo").textContent =
+    `1–2d: ${fmtBRL(r.f1)}/d | FDS: ${fmtBRL(r.fds)} | 3–10d: +${fmtBRL(r.f2)}/d | 11–20d: +${fmtBRL(r.f3)}/d | 21–30d: +${fmtBRL(r.f4)}/d`;
+
+  const marcos = [1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30];
+  tbody.innerHTML = marcos.map(d => {
+    const v = valorClasse(classe, d, false);
+    const fdsNote = (d === 3 && r.fds > 0) ? ` <span class="text-brand-700 font-semibold">(ou ${fmtBRL(r.fds)} FDS)</span>` : "";
+    return `
+      <tr class="hover:bg-brand-50/60">
+        <td class="py-1.5 px-2 font-medium">${d} ${d===1?"dia":"dias"}${fdsNote}</td>
+        <td class="py-1.5 px-2 text-slate-600">${v.faixa}</td>
+        <td class="py-1.5 px-2 font-bold text-kgreen-700">${fmtBRL(v.valor)}</td>
+        <td class="py-1.5 px-2 text-slate-600">${fmtBRL(v.diaria)}/dia</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+el("refClasseSelect").addEventListener("change", renderRefTabela);
+
+// ---------- Exportar / importar configurações (Gestor) ----------
+const APP_ID = "bebe-seguro-orcamentos";
+
+function exportarConfiguracoes(){
+  lerFormAdm();
+  const pacote = {
+    app: APP_ID,
+    versao: 2,
+    exportadoEm: new Date().toISOString(),
+    precos: { classes: clonar(precos.classes) },
+    textos: { dados: { ...DADOS_EMPRESA }, modelo: TEXTO_MODELO }
+  };
+  const blob = new Blob([JSON.stringify(pacote, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `configuracoes-bebe-seguro-${isoDe(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("✅ Configurações exportadas");
+}
+
+function importarConfiguracoes(arquivo){
+  const reader = new FileReader();
+  reader.onload = () => {
+    let pacote;
+    try { pacote = JSON.parse(reader.result); }
+    catch { return alert("Arquivo inválido: não é um JSON."); }
+
+    if (pacote.app !== APP_ID || !pacote.precos || !Array.isArray(pacote.precos.classes))
+      return alert("Este arquivo não é de configurações deste painel.");
+
+    const ids = new Set();
+    const classes = pacote.precos.classes.map(c => {
+      const nome = String(c.nome || "").trim();
+      let id = String(c.id || slug(nome));
+      while (ids.has(id)) id += "-x";
+      ids.add(id);
+      const r = c.regra || REGRA_PADRAO;
+      return {
+        id, nome,
+        regra: {
+          f1: Number(r.f1),
+          fds: Number(r.fds),
+          f2: Number(r.f2),
+          f3: Number(r.f3),
+          f4: Number(r.f4)
+        }
+      };
+    });
+
+    if (!classes.length) return alert("O arquivo não contém nenhuma classe.");
+    for (const c of classes) {
+      if (!c.nome) return alert("Há uma classe sem nome no arquivo.");
+      const erro = validarRegra(c);
+      if (erro) return alert("Arquivo com valores inválidos:\n" + erro);
+    }
+
+    if (!confirm(`Importar ${classes.length} classe(s) e os textos deste arquivo? As configurações atuais serão substituídas.`)) return;
+
+    precos.classes = classes;
+    if (pacote.textos) {
+      if (pacote.textos.dados) {
+        const d = pacote.textos.dados;
+        Object.assign(DADOS_EMPRESA, {
+          pixCpf: d.pixCpf || DADOS_EMPRESA.pixCpf,
+          favorecido: d.favorecido ?? DADOS_EMPRESA.favorecido,
+          endereco: d.endereco ?? DADOS_EMPRESA.endereco,
+          mapa: d.mapa ?? DADOS_EMPRESA.mapa
+        });
+      }
+      if (typeof pacote.textos.modelo === "string") TEXTO_MODELO = pacote.textos.modelo;
+    }
+
+    salvarPrecos();
+    persistirTextosFirebase();
+    renderAdm();
+    carregarFormTextos();
+    renderRefSelect();
+    renderItens();
+    toast("✅ Configurações importadas");
+  };
+  reader.readAsText(arquivo);
+}
+
+el("btnExportar").onclick = exportarConfiguracoes;
+el("btnImportar").onclick = () => el("arquivoImport").click();
+el("arquivoImport").onchange = e => {
+  const arq = e.target.files[0];
+  if (arq) importarConfiguracoes(arq);
+  e.target.value = "";
+};
+
+function novoOrcamento(){
+  if (itens.length && !confirm("Limpar o orçamento atual?")) return;
+  el("dataRetirada").value = "";
+  el("dataDevolucao").value = "";
+  el("diasSlider").value = 1;
+  el("sliderBadge").textContent = "1 dia";
+  el("desconto").value = "0";
+  itens = [];
+  renderItens();
+}
+
+function renderAdm(){
+  el("listaClasses").innerHTML = precos.classes.map((c, ci) => {
+    const r = c.regra;
+    return `
+    <div class="bg-white rounded-xl shadow-sm p-4" data-classe="${ci}">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <input value="${esc(c.nome)}" data-nome-classe
+          class="font-semibold text-base border-b border-transparent focus:border-brand-500 outline-none bg-transparent flex-1 min-w-[140px]" />
+        <div class="flex gap-2 ml-auto">
+          <button data-tornar-padrao class="bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap">Tornar padrão</button>
+          <button data-excluir-classe class="bg-kred-600 hover:bg-kred-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap">Excluir</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Faixa 1 (1–2d) / dia</label>
+          <input type="number" min="0" step="0.01" value="${r.f1}" data-campo="f1" class="w-full border rounded-lg px-2.5 py-1.5 text-sm font-medium" />
+        </div>
+        <div>
+          <label class="block text-brand-700 font-semibold mb-1">Pacote FDS (Sex→Seg)</label>
+          <input type="number" min="0" step="0.01" value="${r.fds}" data-campo="fds" class="w-full border border-brand-200 bg-brand-50/40 rounded-lg px-2.5 py-1.5 text-sm font-medium" />
+        </div>
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Faixa 2 (3–10d) +/dia</label>
+          <input type="number" min="0" step="0.01" value="${r.f2}" data-campo="f2" class="w-full border rounded-lg px-2.5 py-1.5 text-sm font-medium" />
+        </div>
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Faixa 3 (11–20d) +/dia</label>
+          <input type="number" min="0" step="0.01" value="${r.f3}" data-campo="f3" class="w-full border rounded-lg px-2.5 py-1.5 text-sm font-medium" />
+        </div>
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Faixa 4 (21–30d) +/dia</label>
+          <input type="number" min="0" step="0.01" value="${r.f4}" data-campo="f4" class="w-full border rounded-lg px-2.5 py-1.5 text-sm font-medium" />
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-2">
+        Simulação rápida: 10d = <strong>${fmtBRL(valorClasse(c, 10).valor)}</strong> · 20d = <strong>${fmtBRL(valorClasse(c, 20).valor)}</strong> · 30d = <strong>${fmtBRL(valorClasse(c, 30).valor)}</strong>
+      </p>
+    </div>`;
+  }).join("") || `<p class="text-center text-slate-400">Nenhuma classe cadastrada.</p>`;
+  renderCalcClasses();
+}
+
+function validarRegra(classe){
+  const r = classe.regra;
+  if (!r || !(r.f1 >= 0) || !(r.fds >= 0) || !(r.f2 >= 0) || !(r.f3 >= 0) || !(r.f4 >= 0)) {
+    return `"${classe.nome}": valores inválidos nas faixas.`;
+  }
+  return null;
+}
+
+function lerFormAdm(){
+  document.querySelectorAll("#listaClasses > div").forEach((card, ci) => {
+    const c = precos.classes[ci];
+    c.nome = card.querySelector("[data-nome-classe]").value.trim() || c.nome;
+    c.regra = {
+      f1: Number(card.querySelector('[data-campo="f1"]').value),
+      fds: Number(card.querySelector('[data-campo="fds"]').value),
+      f2: Number(card.querySelector('[data-campo="f2"]').value),
+      f3: Number(card.querySelector('[data-campo="f3"]').value),
+      f4: Number(card.querySelector('[data-campo="f4"]').value)
+    };
+  });
+}
+
+function slug(s){
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "classe-" + Date.now();
+}
+
+function salvarAoSairDoGestor(){
+  if (el("viewAdm").classList.contains("hidden")) return true;
+  lerFormAdm();
+  for (const c of precos.classes) {
+    const erro = validarRegra(c);
+    if (erro) { alert("Corrija antes de sair do gestor:\n" + erro); return false; }
+  }
+  renderRefSelect();
+  renderItens();
+  return salvarPrecos();
+}
+
+const VIEWS = { orc: "viewOrc", adm: "viewAdm", textos: "viewTextos" };
+const TABS  = { orc: "tabOrc", adm: "tabAdm", textos: "tabTextos" };
+
+function abaAtual(){
+  return Object.keys(VIEWS).find(k => !el(VIEWS[k]).classList.contains("hidden")) || "orc";
+}
+
+function mostrarAba(aba){
+  const atual = abaAtual();
+  if (atual === aba) return;
+  if (atual === "adm" && !salvarAoSairDoGestor()) return;
+  if (atual === "textos" && !salvarTextos()) return;
+
+  for (const k of Object.keys(VIEWS)) {
+    el(VIEWS[k]).classList.toggle("hidden", k !== aba);
+    el(TABS[k]).className = `tab w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium ${k === aba ? "bg-brand-600 text-white" : "bg-brand-50 text-brand-700"}`;
+  }
+  if (aba === "adm") renderAdm();
+  if (aba === "textos") carregarFormTextos();
+}
+el("tabOrc").onclick = () => mostrarAba("orc");
+el("tabAdm").onclick = () => mostrarAba("adm");
+el("tabTextos").onclick = () => mostrarAba("textos");
+
+el("btnRestaurarTextos").onclick = () => {
+  if (!confirm("Restaurar o texto padrão? As alterações da aba Textos serão perdidas.")) return;
+  el("txtModelo").value = TEXTO_PADRAO;
+};
+
+el("desconto").onchange = recalcular;
+el("btnAddItem").onclick = adicionarItem;
+el("btnCopiar").onclick = copiarResumo;
+el("btnLimpar").onclick = novoOrcamento;
+
+el("listaItens").addEventListener("change", e => {
+  const row = e.target.closest("[data-uid]"); if (!row) return;
+  const it = itens.find(i => i.uid === row.dataset.uid); if (!it) return;
+  if (e.target.dataset.campo === "classeId") {
+    it.classeId = e.target.value;
+    if (it.classeId) {
+      el("refClasseSelect").value = it.classeId;
+      renderRefTabela();
+    }
+  }
+  if (e.target.dataset.campo === "quantidade") {
+    it.quantidade = Math.min(999, Math.max(1, parseInt(e.target.value,10) || 1));
+  }
+  recalcular();
+});
+el("listaItens").addEventListener("click", e => {
+  if (!e.target.matches("[data-remover]")) return;
+  const row = e.target.closest("[data-uid]");
+  itens = itens.filter(i => i.uid !== row.dataset.uid);
+  renderItens();
+});
+
+el("btnNovaClasse").onclick = () => {
+  const nome = el("novaClasseNome").value.trim();
+  if (!nome) return toast("Informe o nome da classe.");
+  let id = slug(nome), n = 2;
+  while (precos.classes.some(c => c.id === id)) id = slug(nome) + "-" + n++;
+  lerFormAdm();
+  precos.classes.push({ id, nome, regra: clonar(REGRA_PADRAO) });
+  el("novaClasseNome").value = "";
+  renderAdm();
+};
+
+el("listaClasses").addEventListener("click", e => {
+  const card = e.target.closest("[data-classe]"); if (!card) return;
+  const ci = Number(card.dataset.classe);
+  lerFormAdm();
+
+  if (e.target.matches("[data-tornar-padrao]")) {
+    const nome = precos.classes[ci].nome;
+    if (!confirm(`Aplicar a regra de "${nome}" a TODAS as classes e torná-la padrão para novas classes?`)) return;
+    const copia = clonar(precos.classes[ci].regra);
+    precos.classes.forEach(c => { c.regra = clonar(copia); });
+    REGRA_PADRAO = clonar(copia);
+    salvarPrecos();
+    renderAdm();
+    toast(`✅ Regra de "${nome}" aplicada a todas as classes.`);
+    return;
+  }
+  if (e.target.matches("[data-excluir-classe]")) {
+    if (!confirm(`Excluir a classe "${precos.classes[ci].nome}"?`)) return;
+    precos.classes.splice(ci, 1);
+    renderAdm();
+  }
+});
+
+function renderCalcClasses(){
+  const sel = el("calcClasse");
+  const atual = sel.value;
+  sel.innerHTML = precos.classes.length
+    ? precos.classes.map(c => `<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join("")
+    : `<option value="">Nenhuma classe</option>`;
+  if (precos.classes.some(c => c.id === atual)) sel.value = atual;
+  recalcCalc();
+}
+
+function recalcCalc(){
+  const out = el("calcTotal");
+  const dias = parseInt(el("calcDias").value, 10);
+  const classe = precos.classes.find(c => c.id === el("calcClasse").value);
+  if (!dias || dias < 1 || !classe) { out.textContent = "—"; return; }
+  const v = valorClasse(classe, dias, false);
+  out.textContent = v.ok ? fmtBRL(v.valor) : "Sem faixa";
+}
+
+el("calcDias").addEventListener("input", recalcCalc);
+el("calcClasse").addEventListener("change", recalcCalc);
+
+// Valores editados na tela refletem na calculadora antes de salvar
+el("listaClasses").addEventListener("input", () => {
+  lerFormAdm();
+  recalcCalc();
+});
+
+// ---------- Sincronização em Tempo Real com Firebase Realtime Database ----------
+db.ref(".info/connected").on("value", snap => {
+  const badge = el("fbStatus");
+  if (!badge) return;
+  if (snap.val() === true) {
+    badge.className = "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+    badge.textContent = "● Nuvem conectada";
+  } else {
+    badge.className = "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800";
+    badge.textContent = "● Offline (cache)";
+  }
+});
+
+REF_PRECOS.on("value", snap => {
+  const val = snap.val();
+  if (!val || !Array.isArray(val.classes) || !val.classes.length) {
+    // Primeiro acesso com banco vazio: envia automaticamente a tabela padrão para o Firebase
+    REF_PRECOS.set(clonar(precos));
+    return;
+  }
+  precos = val;
+  try { localStorage.setItem(CACHE_KEY_PRECOS, JSON.stringify(precos)); } catch {}
+  renderRefSelect();
+  renderItens();
+  if (!el("viewAdm").classList.contains("hidden")) renderAdm();
+}, err => {
+  console.error("Erro ao escutar preços do Firebase:", err);
+});
+
+REF_TEXTOS.on("value", snap => {
+  const val = snap.val();
+  if (!val) {
+    // Primeiro acesso com banco vazio: envia os textos padrão para o Firebase
+    REF_TEXTOS.set({ dados: { ...DADOS_EMPRESA }, modelo: TEXTO_MODELO, atualizadoEm: new Date().toISOString() });
+    return;
+  }
+  if (val.dados) Object.assign(DADOS_EMPRESA, val.dados);
+  if (typeof val.modelo === "string") TEXTO_MODELO = val.modelo;
+  try { localStorage.setItem(CACHE_KEY_TEXTOS, JSON.stringify(val)); } catch {}
+  if (!el("viewTextos").classList.contains("hidden")) carregarFormTextos();
+}, err => {
+  console.error("Erro ao escutar textos do Firebase:", err);
+});
+
+mostrarAba("orc");
+renderRefSelect();
+renderItens();
+</script>
+</body>
+</html>
